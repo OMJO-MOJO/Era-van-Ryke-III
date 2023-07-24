@@ -6,6 +6,7 @@ module.exports = async (instance, client) => {
    const flagsDir = path.resolve("./public/flags");
    const flags = fs.readdirSync(flagsDir);
 
+   // Add flags to emoji lists for current guilds
    for (const [guildId, guild] of client.guilds.cache) {
       for (const flag of flags) {
          const emoji = guild.emojis.cache.find((emoji) => emoji.name === flag.replace(".png", ""));
@@ -17,4 +18,17 @@ module.exports = async (instance, client) => {
          await guild.emojis.create({ attachment: path.join(flagsDir, flag), name: flag.replace(".png", "") }).catch(() => null);
       }
    }
+
+   // Add flags to emoji lists for the new guild
+   client.on("guildCreate", async (guild) => {
+      for (const flag of flags) {
+         const emoji = guild.emojis.cache.find((emoji) => emoji.name === flag.replace(".png", ""));
+
+         if (emoji) {
+            continue;
+         }
+
+         await guild.emojis.create({ attachment: path.join(flagsDir, flag), name: flag.replace(".png", "") }).catch(() => null);
+      }
+   });
 };
