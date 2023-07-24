@@ -1,6 +1,0 @@
-{
-   "botOwnerIds": ["YOUR_DISCORD_ID"],
-   "testServerIds": ["YOUR_TEST_SERVER_ID"],
-   "generalId": "GENERAL_VOICE_CHANNEL_ID",
-   "voiceChannelsId": "VOICE_CHANNELS_CATEGORY_ID"
-}
