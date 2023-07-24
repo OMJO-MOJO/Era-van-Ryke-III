@@ -23,6 +23,7 @@ module.exports = [
    "USA",
 ];
 
+// Civs excluding DLC civs
 module.exports.standard = [
    "Aztec",
    "British",
