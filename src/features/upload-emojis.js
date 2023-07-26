@@ -24,11 +24,17 @@ module.exports = async (instance, client) => {
 
       // Enabled Emoji
       const enabledEmojiDir = path.join(publicDir, "enabled.png");
-      await guild.emojis.create({ attachment: enabledEmojiDir, name: enabledEmojiDir.replace(".png", "") }).catch(() => null);
+      const enabledEmoji = guild.emojis.cache.find((emoji) => emoji.name === "enabled");
+      if (!enabledEmoji) {
+         await guild.emojis.create({ attachment: enabledEmojiDir, name: enabledEmojiDir.replace(".png", "") }).catch(() => null);
+      }
 
       // Disabled emoji
       const disabledEmojiDir = path.join(publicDir, "disabled.png");
-      await guild.emojis.create({ attachment: disabledEmojiDir, name: disabledEmojiDir.replace(".png", "") }).catch(() => null);
+      const disabledEmoji = guild.emojis.cache.find((emoji) => emoji.name === "disabled");
+      if (!disabledEmoji) {
+         await guild.emojis.create({ attachment: disabledEmojiDir, name: disabledEmojiDir.replace(".png", "") }).catch(() => null);
+      }
    }
 
    // Add flags to emoji lists for the new guild
@@ -49,10 +55,16 @@ module.exports = async (instance, client) => {
 
       // Enabled Emoji
       const enabledEmojiDir = path.join(publicDir, "enabled.png");
-      await guild.emojis.create({ attachment: enabledEmojiDir, name: enabledEmojiDir.replace(".png", "") }).catch(() => null);
+      const enabledEmoji = guild.emojis.cache.find((emoji) => emoji.name === "enabled");
+      if (!enabledEmoji) {
+         await guild.emojis.create({ attachment: enabledEmojiDir, name: enabledEmojiDir.replace(".png", "") }).catch(() => null);
+      }
 
       // Disabled emoji
       const disabledEmojiDir = path.join(publicDir, "disabled.png");
-      await guild.emojis.create({ attachment: disabledEmojiDir, name: disabledEmojiDir.replace(".png", "") }).catch(() => null);
+      const disabledEmoji = guild.emojis.cache.find((emoji) => emoji.name === "disabled");
+      if (!disabledEmoji) {
+         await guild.emojis.create({ attachment: disabledEmojiDir, name: disabledEmojiDir.replace(".png", "") }).catch(() => null);
+      }
    });
 };
