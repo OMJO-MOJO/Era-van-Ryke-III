@@ -56,7 +56,7 @@ const deleteChannels = (guild) => {
    const SpanB = guild.channels.cache.find((channel) => channel.name === "Span B");
 
    // Check if the channels are empty
-   if (General.members.size === 0 && SpanA.members.size === 0 && SpanB.members.size === 0) {
+   if (General?.members.size === 0 && SpanA?.members.size === 0 && SpanB?.members.size === 0) {
       guild.channels.delete(SpanA.id).catch(() => null);
       guild.channels.delete(SpanB.id).catch(() => null);
    }
