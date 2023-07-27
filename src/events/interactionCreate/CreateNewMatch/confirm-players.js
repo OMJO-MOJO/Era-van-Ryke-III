@@ -10,14 +10,14 @@ module.exports = async (interaction, instance) => {
 
    let i = 0;
    let value = [];
-   for (const result of results) {
-      const { member, civ } = result;
+   for (const [_, player] of results) {
+      const { member, civ, totalCivs } = player;
 
       const flag = await interaction.guild.emojis.cache.find((emoji) => emoji.name === civ.name);
 
       value.push({
          name: i === 0 ? "Results" : "** **",
-         value: `- ${member.user.username} \n> ${flag ? flag.toString() : "❔"} ${civ.name}`,
+         value: `- **${member.user.username}**\n> ${flag ? flag.toString() : "❔"} ${civ.name}\n  - *1/${totalCivs} Civs* `,
          inline: true,
       });
 
@@ -29,7 +29,7 @@ module.exports = async (interaction, instance) => {
          .setCustomId("regenerate-civs")
          .setLabel("New Civs")
          .setStyle(ButtonStyle.Primary)
-         .setDisabled(PlayerManager.players.size === 0 ? true : false),
+         .setDisabled(PlayerManager._players.size === 0 ? true : false),
 
       new ButtonBuilder().setCustomId("close-civs").setLabel("Close").setStyle(ButtonStyle.Danger)
    );

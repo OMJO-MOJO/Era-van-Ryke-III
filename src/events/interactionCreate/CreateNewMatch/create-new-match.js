@@ -1,7 +1,7 @@
 const { EmbedBuilder, ActionRowBuilder, UserSelectMenuBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const PlayerManager = require("../../../features/PlayerManager");
 
-module.exports = (interaction, instance) => {
+module.exports = async (interaction, instance) => {
    if (interaction.customId !== "create-new-match") {
       return;
    }
@@ -19,7 +19,7 @@ module.exports = (interaction, instance) => {
 
       for (const [userId, member] of channel.members) {
          // Register the player to the manager
-         PlayerManager.addPlayer(member);
+         await PlayerManager.addPlayer(member);
 
          // Add player to string
          players += `- ${member.user.username}\n`;

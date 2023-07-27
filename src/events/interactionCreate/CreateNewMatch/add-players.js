@@ -1,7 +1,7 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const PlayerManager = require("../../../features/PlayerManager");
 
-module.exports = (interaction, instance) => {
+module.exports = async (interaction, instance) => {
    if (interaction.customId !== "add-players") {
       return;
    }
@@ -15,12 +15,14 @@ module.exports = (interaction, instance) => {
          continue;
       }
 
-      PlayerManager.addPlayer(member);
+      await PlayerManager.addPlayer(member);
    }
 
    // Generate Output for the user
    let players = "";
-   for (const [userId, member] of PlayerManager.players) {
+   for (const [_, player] of PlayerManager.players) {
+      const { member } = player;
+
       // Add player to string
       players += `- ${member.user.username}\n`;
    }
