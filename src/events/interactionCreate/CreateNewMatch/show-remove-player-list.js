@@ -9,5 +9,7 @@ module.exports = (interaction, instance) => {
       new UserSelectMenuBuilder().setCustomId("remove-player").setMinValues(1).setMaxValues(1).setPlaceholder("Select a player to remove")
    );
 
-   interaction.update({ components: [removePlayers] });
+   const button = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("close-civs").setLabel("Close").setStyle(ButtonStyle.Danger));
+
+   interaction.update({ components: [removePlayers, button] });
 };

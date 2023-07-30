@@ -9,5 +9,7 @@ module.exports = (interaction, instance) => {
       new UserSelectMenuBuilder().setCustomId("add-players").setMinValues(1).setMaxValues(8).setPlaceholder("Select players to add")
    );
 
-   interaction.update({ components: [addPlayers] });
+   const button = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("close-civs").setLabel("Close").setStyle(ButtonStyle.Danger));
+
+   interaction.update({ components: [addPlayers, button] });
 };

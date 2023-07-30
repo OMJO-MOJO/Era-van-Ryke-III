@@ -32,7 +32,8 @@ module.exports = (interaction, instance) => {
             .setCustomId("confirm-players")
             .setLabel("Confirm Players")
             .setStyle(ButtonStyle.Primary)
-            .setDisabled(PlayerManager.players.size === 0 ? true : false)
+            .setDisabled(PlayerManager.players.size === 0 ? true : false),
+         new ButtonBuilder().setCustomId("close-civs").setLabel("Close").setStyle(ButtonStyle.Danger)
       );
    }
 
