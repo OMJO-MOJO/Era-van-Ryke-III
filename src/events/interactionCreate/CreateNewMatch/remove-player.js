@@ -16,7 +16,7 @@ module.exports = (interaction, instance) => {
    let players = "";
    for (const [userId, member] of PlayerManager.players) {
       // Add player to string
-      players += `- ${member.user.username}\n`;
+      players += `- ${member.member.user.username}\n`;
    }
 
    const embed = new EmbedBuilder(interaction.message.embeds[0].data).setFields({
