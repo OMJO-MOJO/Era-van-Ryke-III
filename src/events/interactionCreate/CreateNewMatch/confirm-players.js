@@ -7,6 +7,18 @@ module.exports = async (interaction, instance) => {
    }
 
    const results = await PlayerManager.generateCivs();
+   if (!results) {
+      return interaction.update({
+         embeds: [
+            new EmbedBuilder()
+               .setColor("Red")
+               .setDescription(`There were no players found, this could be due to the bot restarting.\nPlease create a new match.`),
+         ],
+         components: [
+            new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId("close-civs").setLabel("Close").setStyle(ButtonStyle.Danger)),
+         ],
+      });
+   }
 
    let i = 0;
    let value = [];

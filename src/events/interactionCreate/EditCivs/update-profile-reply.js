@@ -16,7 +16,16 @@ module.exports = async (interaction, instance) => {
       interaction.update({ content: "❌ - Failed to fetch data from the database." });
    }
 
-   const config = profile.civs.filter((civ) => civ.name === interaction.values[0])[0];
+   // Get the raw profile data
+   let selectedProfile = interaction.message.embeds[0].data.description.split(/\n/g)[0].split("");
+   const index = selectedProfile.indexOf(">");
+
+   // Update the selected profile
+   selectedProfile = selectedProfile.splice(index + 2, selectedProfile.length - index).join("");
+   selectedProfile = profile.profiles.filter((profile) => profile.name === selectedProfile)[0];
+
+   // Get the config for which civs are enabled and disabled
+   const config = selectedProfile.civs.filter((civ) => civ.name === interaction.values[0])[0];
 
    const enabled = config.enabled;
 
@@ -49,7 +58,8 @@ module.exports = async (interaction, instance) => {
    // Buttons
    const newButtons = new ActionRowBuilder().addComponents(
       new ButtonBuilder().setCustomId("enable-civ").setLabel(`Enable ${interaction.values[0]}`).setStyle(ButtonStyle.Primary).setDisabled(!!enabled),
-      new ButtonBuilder().setCustomId("disable-civ").setLabel(`Disable ${interaction.values[0]}`).setStyle(ButtonStyle.Danger).setDisabled(!enabled)
+      new ButtonBuilder().setCustomId("disable-civ").setLabel(`Disable ${interaction.values[0]}`).setStyle(ButtonStyle.Danger).setDisabled(!enabled),
+      new ButtonBuilder().setCustomId("back_select-profile").setLabel("Back").setStyle(ButtonStyle.Secondary).setDisabled(false)
    );
 
    return interaction.update({ components: [listedCivs, newButtons] });

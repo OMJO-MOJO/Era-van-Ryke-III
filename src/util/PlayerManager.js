@@ -1,5 +1,5 @@
 const profilesSchema = require("../schemas/profiles.schema");
-const { standard } = require("../util/civs");
+const civs = require("../util/civs");
 
 class PlayerManager {
    constructor() {
@@ -22,17 +22,48 @@ class PlayerManager {
          throw new Error('The "member" field is required.');
       }
 
-      let totalCivs = standard.length;
+      let profile;
+      let totalCivs = civs.standard.length;
 
       // Fetch from the database
-      const profile = await profilesSchema.findOne({ userId: member.user.id });
-      if (profile) {
-         // Get the enabled civs for the player
-         totalCivs = profile.civs.filter((civ) => civ.enabled === true)?.length;
+      let playerProfile = await profilesSchema.findOne({ userId: member.user.id });
+      if (playerProfile) {
+         // Set the player's default profile
+         profile = playerProfile.profiles.filter((profile) => profile.default)[0];
+      } else {
+         // Create a new player profile
+         const defaultConfig = [];
+         for (const civ of civs) {
+            // Enabled all standard civs and disable all DLC civs
+            if (civs.standard.includes(civ)) {
+               defaultConfig.push({ name: civ, enabled: true });
+            } else {
+               defaultConfig.push({ name: civ, enabled: false });
+            }
+         }
+
+         // Save to the DB
+         playerProfile = await new profilesSchema({
+            userId: member.user.id,
+            profiles: [
+               {
+                  name: "Profile 1",
+                  default: true,
+                  civs: defaultConfig,
+               },
+            ],
+         }).save();
       }
 
+      if (!profile) {
+         profile = playerProfile.profiles[0];
+      }
+
+      // Get the enabled civs for the player
+      totalCivs = profile.civs.filter((civ) => civ.enabled === true)?.length;
+
       // Add the player to the list
-      this._players.set(member.user.id, { member, civ: null, totalCivs: totalCivs });
+      this._players.set(member.user.id, { member, profile, civ: null, totalCivs: totalCivs });
    }
 
    removePlayer(id) {
@@ -71,7 +102,7 @@ class PlayerManager {
 
       // Loop through all players and set their civs to null
       for (const [userId, player] of this._players) {
-         this._players.set(userId, { member: player.member, civ: null, totalCivs: player.totalCivs });
+         this._players.set(userId, { member: player.member, profile: player.profile, civ: null, totalCivs: player.totalCivs });
       }
    }
 
@@ -84,40 +115,39 @@ class PlayerManager {
          There is probably a better way of achieving this but it's 2am and I'm tired, but it works.
       */
 
+      if (this._players.size === 0) {
+         return null;
+      }
+
       // Reset the players' civ
       this.resetCivs();
 
       // Generate a list of players to sort
       const playerList = [];
-      for (const [userId, member] of this._players) {
-         // Get the user's profile from the database
-         const profile = await profilesSchema.findOne({ userId });
+      for (const [userId, player] of this._players) {
+         // Make sure that the player's profile is up to date
+         const playerProfile = await profilesSchema.findOne({ userId: player.member.user.id });
+         if (playerProfile) {
+            // Get the profile of the player
+            player.profile = playerProfile.profiles.filter((profile) => profile.default)[0];
+            player.totalCivs = player.profile.civs.filter((civ) => civ.enabled).length;
 
-         // The player does not have a config saved to their profile, thus any random nation will be selected
-         if (!profile) {
-            // Format the standard civs into the required format
-            const formatedStandard = [];
-            for (const civ of standard) {
-               formatedStandard.push({ name: civ });
-            }
-
-            playerList.push({ member, civs: formatedStandard });
-            continue;
+            // Update the player
+            this._players.set(userId, player);
          }
 
          // Get the enabled civs for the player
-         const availableCivs = profile.civs.filter((civ) => civ.enabled === true);
+         const availableCivs = player.profile.civs.filter((civ) => civ.enabled === true);
 
-         playerList.push({ member, civs: availableCivs });
+         playerList.push({ player, civs: availableCivs });
       }
 
       // Sort the player list
       playerList.sort((a, b) => a.civs.length - b.civs.length);
 
       // Generate a civ for each player in the list
-      for (const player of playerList) {
-         const { member: aoeMember, civs } = player;
-         const { member } = aoeMember;
+      for (const member of playerList) {
+         const { player, civs } = member;
 
          // Check for mirrors in the match
          let isMirror = true;
@@ -133,7 +163,7 @@ class PlayerManager {
                isMirror = false;
 
                // Save the civ to the player in the cache
-               this.setCiv(member.user.id, possibleCiv);
+               this.setCiv(player.member.user.id, possibleCiv);
             }
          }
       }

@@ -7,7 +7,7 @@ module.exports = async (instance, client) => {
    const flags = fs.readdirSync(flagsDir);
 
    // Add flags to emoji lists for current guilds
-   for (const [guildId, guild] of client.guilds.cache) {
+   for (const [_, guild] of client.guilds.cache) {
       for (const flag of flags) {
          const emoji = guild.emojis.cache.find((emoji) => emoji.name === flag.replace(".png", ""));
 
@@ -20,20 +20,18 @@ module.exports = async (instance, client) => {
       }
 
       // Upload the enabled and disabled emojis
-      const publicDir = path.resolve("./public");
+      const emojisDir = path.resolve("./public/emojis");
+      const emojis = fs.readdirSync(emojisDir);
 
-      // Enabled Emoji
-      const enabledEmojiDir = path.join(publicDir, "enabled.png");
-      const enabledEmoji = guild.emojis.cache.find((emoji) => emoji.name === "enabled");
-      if (!enabledEmoji) {
-         await guild.emojis.create({ attachment: enabledEmojiDir, name: enabledEmojiDir.replace(".png", "") }).catch(() => null);
-      }
+      for (const emoji of emojis) {
+         const isEmoji = !!guild.emojis.cache.find((e) => e.name === emoji.replace(".png", ""));
 
-      // Disabled emoji
-      const disabledEmojiDir = path.join(publicDir, "disabled.png");
-      const disabledEmoji = guild.emojis.cache.find((emoji) => emoji.name === "disabled");
-      if (!disabledEmoji) {
-         await guild.emojis.create({ attachment: disabledEmojiDir, name: disabledEmojiDir.replace(".png", "") }).catch(() => null);
+         if (isEmoji) {
+            continue;
+         }
+
+         // Upload the emoji
+         await guild.emojis.create({ attachment: path.join(emojisDir, emoji), name: emoji.replace(".png", "") }).catch(() => null);
       }
    }
 
@@ -51,20 +49,18 @@ module.exports = async (instance, client) => {
       }
 
       // Upload the enabled and disabled emojis
-      const publicDir = path.resolve("./public");
+      const emojisDir = path.resolve("./public/emojis");
+      const emojis = fs.readdirSync(emojisDir);
 
-      // Enabled Emoji
-      const enabledEmojiDir = path.join(publicDir, "enabled.png");
-      const enabledEmoji = guild.emojis.cache.find((emoji) => emoji.name === "enabled");
-      if (!enabledEmoji) {
-         await guild.emojis.create({ attachment: enabledEmojiDir, name: enabledEmojiDir.replace(".png", "") }).catch(() => null);
-      }
+      for (const emoji of emojis) {
+         const isEmoji = !!guild.emojis.cache.find((e) => e.name === emoji.replace(".png", ""));
 
-      // Disabled emoji
-      const disabledEmojiDir = path.join(publicDir, "disabled.png");
-      const disabledEmoji = guild.emojis.cache.find((emoji) => emoji.name === "disabled");
-      if (!disabledEmoji) {
-         await guild.emojis.create({ attachment: disabledEmojiDir, name: disabledEmojiDir.replace(".png", "") }).catch(() => null);
+         if (isEmoji) {
+            continue;
+         }
+
+         // Upload the emoji
+         await guild.emojis.create({ attachment: path.join(emojisDir, emoji), name: emoji.replace(".png", "") }).catch(() => null);
       }
    });
 };
