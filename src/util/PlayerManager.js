@@ -1,3 +1,4 @@
+const { rate, rating, predictDraw } = require("openskill");
 const profilesSchema = require("../schemas/profiles.schema");
 const civs = require("../util/civs");
 
@@ -6,6 +7,8 @@ class PlayerManager {
       // <userId, { member, civ, totalCivs }>
       this._players = new Map();
       this._unavailableCivs = [];
+      this._team1 = {};
+      this._team2 = {};
    }
 
    get players() {
@@ -63,7 +66,7 @@ class PlayerManager {
       totalCivs = profile.civs.filter((civ) => civ.enabled === true)?.length;
 
       // Add the player to the list
-      this._players.set(member.user.id, { member, profile, civ: null, totalCivs: totalCivs });
+      this._players.set(member.user.id, { member, profile, rating: playerProfile.rating, civ: null, totalCivs: totalCivs });
    }
 
    removePlayer(id) {
@@ -169,6 +172,115 @@ class PlayerManager {
       }
 
       return this._players;
+   }
+
+   async generateTeams() {
+      if (this._players.size < 2) {
+         throw new Error("Cannot start a new game if there are less than 2 players.");
+      }
+
+      // Reset the cached teams
+      this._team1 = {};
+      this._team2 = {};
+
+      const options = [];
+
+      let i = 0;
+      while (i < 25) {
+         // Reset all the teams
+         const team1Ids = [];
+         const team2Ids = [];
+         const team1Rating = [];
+         const team2Rating = [];
+
+         for (const [userId, player] of this._players) {
+            // Check if the player has a rating
+            if (!player.rating) {
+               // Generate a rating for the player
+               player.rating = rating();
+               // Update the player
+               this._players.set(userId, player);
+            }
+
+            // Generate a random number
+            const randomNum = Math.floor(Math.random() * 2) + 1;
+
+            // Assign the player to the correct team
+            if (randomNum === 1) {
+               team1Ids.push(player.member.user.id);
+               team1Rating.push(player.rating);
+            } else {
+               team2Ids.push(player.member.user.id);
+               team2Rating.push(player.rating);
+            }
+         }
+
+         if (team1Rating.length === 0 || team2Rating.length === 0) {
+            // No players in one of the teams
+            continue;
+         }
+
+         // Check the probability of the teams drawing
+         const prediction = predictDraw([team1Rating, team2Rating]);
+
+         // Save the possible teams to the options array
+         options.push({
+            prediction,
+            team1: team1Ids,
+            team1Rating,
+            team2: team2Ids,
+            team2Rating,
+         });
+
+         i++;
+      }
+
+      // Sort the results to the highest prediction to draw to get the best even match
+      options.sort((a, b) => b.prediction - a.prediction);
+
+      // The best result
+      const result = options[0];
+
+      // Assign the team to the cached teams
+      this._team1 = { ids: result.team1, rating: result.team1Rating };
+      this._team2 = { ids: result.team2, rating: result.team2Rating };
+
+      return { team1: this._team1, team2: this._team2 };
+   }
+
+   async updateRankings(winningTeamNum) {
+      // Adjust all the ratings of all the players
+      let winningTeam = null;
+      let losingTeam = null;
+
+      // Check which team won
+      if (winningTeamNum === 1) {
+         winningTeam = { ids: this._team1.ids, rating: this._team1.rating };
+         losingTeam = { ids: this._team2.ids, rating: this._team2.rating };
+      } else if (winningTeamNum === 2) {
+         winningTeam = { ids: this._team2.ids, rating: this._team2.rating };
+         losingTeam = { ids: this._team1.ids, rating: this._team1.rating };
+      } else {
+         throw new Error("Please specify a team number between 1 and 2.");
+      }
+
+      const [winningTeamResults, losingTeamResults] = rate([winningTeam.rating, losingTeam.rating]);
+
+      // Update the ratings of the winners
+      for (let i = 0; i < winningTeam.ids.length; i++) {
+         await profilesSchema.updateOne({ userId: winningTeam.ids[i] }, { rating: winningTeamResults[i] });
+      }
+
+      // Update the ratings of the losers
+      for (let i = 0; i < losingTeam.ids.length; i++) {
+         await profilesSchema.updateOne({ userId: losingTeam.ids[i] }, { rating: losingTeamResults[i] });
+      }
+
+      // Reset all the caches because the match was compelte
+      this._players = new Map();
+      this._unavailableCivs = [];
+      this._team1 = {};
+      this._team2 = {};
    }
 }
 

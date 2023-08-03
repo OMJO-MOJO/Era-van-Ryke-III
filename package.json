@@ -20,6 +20,7 @@
    "dependencies": {
       "discord.js": "^14.11.0",
       "dotenv": "^16.3.1",
+      "openskill": "^3.1.0",
       "wokcommands": "^2.1.9"
    }
 }

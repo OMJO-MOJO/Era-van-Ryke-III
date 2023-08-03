@@ -36,18 +36,24 @@ module.exports = async (interaction, instance) => {
       i++;
    }
 
-   const regenerateCivs = new ActionRowBuilder().addComponents(
+   const buttons = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+         .setCustomId("generate-teams")
+         .setLabel(PlayerManager.players.size >= 2 ? "Generate Teams" : "Need at least 2 players to create teams")
+         .setStyle(ButtonStyle.Primary)
+         .setDisabled(PlayerManager.players.size < 2 ? true : false),
+
       new ButtonBuilder()
          .setCustomId("regenerate-civs")
          .setLabel("New Civs")
-         .setStyle(ButtonStyle.Primary)
-         .setDisabled(PlayerManager._players.size === 0 ? true : false),
+         .setStyle(ButtonStyle.Secondary)
+         .setDisabled(PlayerManager.players.size === 0 ? true : false),
 
       new ButtonBuilder().setCustomId("close-civs").setLabel("Close").setStyle(ButtonStyle.Danger)
    );
 
    interaction.update({
       embeds: [new EmbedBuilder(interaction.message.embeds[0].data).setDescription(null).setFields(value)],
-      components: [regenerateCivs],
+      components: [buttons],
    });
 };

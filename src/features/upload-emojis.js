@@ -9,14 +9,14 @@ module.exports = async (instance, client) => {
    // Add flags to emoji lists for current guilds
    for (const [_, guild] of client.guilds.cache) {
       for (const flag of flags) {
-         const emoji = guild.emojis.cache.find((emoji) => emoji.name === flag.replace(".png", ""));
+         const emoji = guild.emojis.cache.find((emoji) => emoji.name === flag.replace(".png", "").replace(".gif", ""));
 
          if (emoji) {
             continue;
          }
 
          // Upload the emoji
-         await guild.emojis.create({ attachment: path.join(flagsDir, flag), name: flag.replace(".png", "") }).catch(() => null);
+         await guild.emojis.create({ attachment: path.join(flagsDir, flag), name: flag.replace(".png", "").replace(".gif", "") }).catch(() => null);
       }
 
       // Upload the enabled and disabled emojis
@@ -24,14 +24,16 @@ module.exports = async (instance, client) => {
       const emojis = fs.readdirSync(emojisDir);
 
       for (const emoji of emojis) {
-         const isEmoji = !!guild.emojis.cache.find((e) => e.name === emoji.replace(".png", ""));
+         const isEmoji = !!guild.emojis.cache.find((e) => e.name === emoji.replace(".png", "").replace(".gif", ""));
 
          if (isEmoji) {
             continue;
          }
 
          // Upload the emoji
-         await guild.emojis.create({ attachment: path.join(emojisDir, emoji), name: emoji.replace(".png", "") }).catch(() => null);
+         await guild.emojis
+            .create({ attachment: path.join(emojisDir, emoji), name: emoji.replace(".png", "").replace(".gif", "") })
+            .catch(() => null);
       }
    }
 
@@ -39,13 +41,13 @@ module.exports = async (instance, client) => {
    client.on("guildCreate", async (guild) => {
       // upload the flags
       for (const flag of flags) {
-         const emoji = guild.emojis.cache.find((emoji) => emoji.name === flag.replace(".png", ""));
+         const emoji = guild.emojis.cache.find((emoji) => emoji.name === flag.replace(".png", "").replace(".gif", ""));
 
          if (emoji) {
             continue;
          }
 
-         await guild.emojis.create({ attachment: path.join(flagsDir, flag), name: flag.replace(".png", "") }).catch(() => null);
+         await guild.emojis.create({ attachment: path.join(flagsDir, flag), name: flag.replace(".png", "").replace(".gif", "") }).catch(() => null);
       }
 
       // Upload the enabled and disabled emojis
@@ -53,14 +55,16 @@ module.exports = async (instance, client) => {
       const emojis = fs.readdirSync(emojisDir);
 
       for (const emoji of emojis) {
-         const isEmoji = !!guild.emojis.cache.find((e) => e.name === emoji.replace(".png", ""));
+         const isEmoji = !!guild.emojis.cache.find((e) => e.name === emoji.replace(".png", "").replace(".gif", ""));
 
          if (isEmoji) {
             continue;
          }
 
          // Upload the emoji
-         await guild.emojis.create({ attachment: path.join(emojisDir, emoji), name: emoji.replace(".png", "") }).catch(() => null);
+         await guild.emojis
+            .create({ attachment: path.join(emojisDir, emoji), name: emoji.replace(".png", "").replace(".gif", "") })
+            .catch(() => null);
       }
    });
 };
