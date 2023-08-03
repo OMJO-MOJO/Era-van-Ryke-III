@@ -20,6 +20,13 @@ class PlayerManager {
       this._unavailableCivs = [];
    }
 
+   resetAll() {
+      this._players = new Map();
+      this._unavailableCivs = [];
+      this._team1 = {};
+      this._team2 = {};
+   }
+
    async addPlayer(member) {
       if (!member) {
          throw new Error('The "member" field is required.');
@@ -277,10 +284,7 @@ class PlayerManager {
       }
 
       // Reset all the caches because the match was compelte
-      this._players = new Map();
-      this._unavailableCivs = [];
-      this._team1 = {};
-      this._team2 = {};
+      this.resetAll();
    }
 }
 

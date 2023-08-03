@@ -35,6 +35,9 @@ module.exports = async (interaction, instance) => {
    const action = req[0];
 
    if (action === "discard") {
+      // Reset the caches
+      PlayerManager.resetAll();
+
       return interaction.update({
          embeds: [
             new EmbedBuilder(interaction.message.embeds[0].data)
