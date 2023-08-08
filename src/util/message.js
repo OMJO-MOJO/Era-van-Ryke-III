@@ -15,7 +15,7 @@ module.exports = {
    ],
    components: [
       new ActionRowBuilder().addComponents(
-         new ButtonBuilder().setCustomId("create-new-match").setLabel("Create new match").setStyle(ButtonStyle.Success),
+         new ButtonBuilder().setCustomId("create-new-match").setLabel("Create new match").setStyle(ButtonStyle.Success).setDisabled(false),
          new ButtonBuilder().setCustomId("select-profile").setLabel("Profiles").setStyle(ButtonStyle.Primary),
          new ButtonBuilder().setCustomId("display-leaderboard").setLabel("Leaderboard").setStyle(ButtonStyle.Secondary)
       ),

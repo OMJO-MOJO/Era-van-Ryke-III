@@ -1,12 +1,11 @@
 const { EmbedBuilder, ActionRowBuilder, UserSelectMenuBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const PlayerManager = require("../../../features/PlayerManager");
+const message = require("../../../util/message");
 
 module.exports = async (interaction, instance) => {
    if (interaction.customId !== "create-new-match") {
       return;
    }
-
-   // TODO: Disable the Create New Match button
 
    // Clear the player setup
    PlayerManager.clearPlayers();
@@ -67,6 +66,27 @@ module.exports = async (interaction, instance) => {
       new ButtonBuilder().setCustomId("close-civs").setLabel("Close").setStyle(ButtonStyle.Danger)
    );
 
+   // Disable the Create New Match button
+   await message.components[0].components[0].setDisabled(true);
+
+   // update the menu
+   interaction.channel.messages.fetch().then((result) => {
+      for (const [_, menuMessage] of result) {
+         // Do not check for users
+         if (!menuMessage.author.bot) {
+            continue;
+         }
+
+         if (menuMessage.embeds[0]?.data.author?.name === "Age of Empires III Definitive Edition") {
+            // Update the button
+            menuMessage.edit({
+               components: message.components,
+            });
+         }
+      }
+   });
+
+   // Reply to the user
    interaction.reply({
       embeds: [embed],
       components: [buttons],
