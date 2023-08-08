@@ -3,5 +3,7 @@ module.exports = (interaction, instance) => {
       return;
    }
 
+   // TODO: Enable the Create New Match button
+
    interaction.message.delete();
 };

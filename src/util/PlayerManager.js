@@ -1,4 +1,4 @@
-const { rate, rating, predictDraw, ordinal } = require("openskill");
+const { rate, rating, predictDraw, ordinal, predictWin } = require("openskill");
 const profilesSchema = require("../schemas/profiles.schema");
 const civs = require("../util/civs");
 
@@ -120,7 +120,11 @@ class PlayerManager {
 
       // Loop through all players and set their civs to null
       for (const [userId, player] of this._players) {
-         this._players.set(userId, { member: player.member, profile: player.profile, civ: null, totalCivs: player.totalCivs });
+         player.civ = null;
+
+         this._players.set(userId, player);
+
+         // this._players.set(userId, { member: player.member, profile: player.profile, civ: null, totalCivs: player.totalCivs });
       }
    }
 
@@ -235,6 +239,8 @@ class PlayerManager {
             continue;
          }
 
+         // TODO: Check if the same game has been previously played
+
          // Check the probability of the teams drawing
          const prediction = predictDraw([team1Rating, team2Rating]);
 
@@ -316,6 +322,10 @@ class PlayerManager {
 
       // Sort the rankings from 1st to last
       return rankings.sort((a, b) => b.rating - a.rating);
+   }
+
+   async predictWin() {
+      return predictWin([this._team1.rating, this._team2.rating]);
    }
 }
 

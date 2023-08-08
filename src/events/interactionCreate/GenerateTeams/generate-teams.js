@@ -72,6 +72,23 @@ module.exports = async (interaction, instance) => {
       team2.push(`${flag} ${member.user.username}`);
    }
 
+   // Get the predicted winning rates
+   const predictedWinningRates = await PlayerManager.predictWin();
+
+   // Get the teams' winning rate
+   const [team1WinningRate, team2WinningRate] = predictedWinningRates;
+   const team1WinPercent = parseFloat((team1WinningRate * 100).toFixed(1));
+   const team2WinPercent = parseFloat((team2WinningRate * 100).toFixed(1));
+
+   // Check if the game is predicted to draw
+   let perfectDraw = false;
+   if (team1WinningRate === team2WinningRate) {
+      perfectDraw = true;
+   }
+
+   // Get the winning team num
+   const predictedWinningTeamNum = team1WinningRate > team2WinningRate ? 1 : 2;
+
    const redSiren = (await interaction.guild.emojis.cache.find((emoji) => emoji.name === "redSiren")?.toString()) || "❔";
    const blueSiren = (await interaction.guild.emojis.cache.find((emoji) => emoji.name === "blueSiren")?.toString()) || "❔";
    const team1Emoji = (await interaction.guild.emojis.cache.find((emoji) => emoji.name === "one")?.toString()) || "❔";
@@ -94,6 +111,16 @@ module.exports = async (interaction, instance) => {
             name: `${team2Emoji} Team 2`,
             value: `- ${team2.join("\n- ")}`,
             inline: true,
+         },
+         {
+            name: "🏆 Predicted Winning Team",
+            value: `- ||${
+               perfectDraw
+                  ? `❓ Draw`
+                  : `${predictedWinningTeamNum === 1 ? team1Emoji : team2Emoji} Team ${predictedWinningTeamNum} *(${
+                       predictedWinningTeamNum === 1 ? team1WinPercent : team2WinPercent
+                    }%)*`
+            }||`,
          }
       );
 

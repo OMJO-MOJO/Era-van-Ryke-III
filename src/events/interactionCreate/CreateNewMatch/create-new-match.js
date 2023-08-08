@@ -6,6 +6,8 @@ module.exports = async (interaction, instance) => {
       return;
    }
 
+   // TODO: Disable the Create New Match button
+
    // Clear the player setup
    PlayerManager.clearPlayers();
 
