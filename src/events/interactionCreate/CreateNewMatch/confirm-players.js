@@ -6,6 +6,17 @@ module.exports = async (interaction, instance) => {
       return;
    }
 
+   if (!PlayerManager.players.get(interaction.member.user.id)) {
+      return interaction.reply({
+         embeds: [
+            new EmbedBuilder()
+               .setColor("Red")
+               .setDescription("❌ - You cannot assign civs to players because you are not a player in the current match."),
+         ],
+         ephemeral: true,
+      });
+   }
+
    const results = await PlayerManager.generateCivs();
    if (!results) {
       return interaction.update({

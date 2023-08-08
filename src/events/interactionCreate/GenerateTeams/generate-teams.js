@@ -6,6 +6,17 @@ module.exports = async (interaction, instance) => {
       return;
    }
 
+   if (!PlayerManager.players.get(interaction.member.user.id)) {
+      return interaction.reply({
+         embeds: [
+            new EmbedBuilder()
+               .setColor("Red")
+               .setDescription("❌ - Generate teams because only players are allowed to and you are not a player in the current match."),
+         ],
+         ephemeral: true,
+      });
+   }
+
    if (PlayerManager.players.size < 2) {
       return interaction.update({
          embeds: [
@@ -126,6 +137,8 @@ module.exports = async (interaction, instance) => {
 
    const buttons = new ActionRowBuilder().addComponents(
       new ButtonBuilder().setCustomId("enter-match-results").setLabel("Enter Match Results").setStyle(ButtonStyle.Primary),
+
+      new ButtonBuilder().setCustomId("move-players-to-vc").setLabel("Move Players to VCs").setStyle(ButtonStyle.Success),
 
       new ButtonBuilder().setCustomId("generate-teams").setLabel("Regenerate Teams").setStyle(ButtonStyle.Secondary),
 

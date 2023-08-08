@@ -16,11 +16,11 @@ class PlayerManager {
    }
 
    get team1() {
-      return this.team1;
+      return this._team1;
    }
 
    get team2() {
-      return this.team2;
+      return this._team2;
    }
 
    clearPlayers() {
