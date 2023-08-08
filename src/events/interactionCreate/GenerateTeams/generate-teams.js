@@ -77,6 +77,7 @@ module.exports = async (interaction, instance) => {
    const team1Emoji = (await interaction.guild.emojis.cache.find((emoji) => emoji.name === "one")?.toString()) || "❔";
    const team2Emoji = (await interaction.guild.emojis.cache.find((emoji) => emoji.name === "two")?.toString()) || "❔";
 
+   // TODO: Added a prefiction of which team wins: use the spoilers "||${prediction}||"
    const embed = new EmbedBuilder()
       .setColor(0xd7a35f)
       .setTitle(`${redSiren} Important Information ${blueSiren}`)

@@ -23,6 +23,11 @@ module.exports = (instance, client) => {
                   // Update the message to the required
                   message.edit(reply).catch(() => null);
                }
+
+               if (message.components !== reply.components) {
+                  // Update the message to the required
+                  message.edit(reply).catch(() => null);
+               }
             }
          }
       });

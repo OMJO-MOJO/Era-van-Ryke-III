@@ -1,4 +1,4 @@
-const { rate, rating, predictDraw } = require("openskill");
+const { rate, rating, predictDraw, ordinal } = require("openskill");
 const profilesSchema = require("../schemas/profiles.schema");
 const civs = require("../util/civs");
 
@@ -13,6 +13,14 @@ class PlayerManager {
 
    get players() {
       return this._players;
+   }
+
+   get team1() {
+      return this.team1;
+   }
+
+   get team2() {
+      return this.team2;
    }
 
    clearPlayers() {
@@ -285,6 +293,29 @@ class PlayerManager {
 
       // Reset all the caches because the match was compelte
       this.resetAll();
+   }
+
+   async getRankings() {
+      // Get all the profiles from the database
+      const results = await profilesSchema.find({});
+
+      if (!results) {
+         return null;
+      }
+
+      // Get their rankings and store it in an array for sorting
+      const rankings = [];
+      for (const result of results) {
+         const rating = ordinal(result.rating);
+
+         rankings.push({
+            userId: result.userId,
+            rating,
+         });
+      }
+
+      // Sort the rankings from 1st to last
+      return rankings.sort((a, b) => b.rating - a.rating);
    }
 }
 
