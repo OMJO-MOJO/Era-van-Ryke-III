@@ -7,6 +7,7 @@ class PlayerManager {
       // <userId, { member, civ, totalCivs }>
       this._players = new Map();
       this._unavailableCivs = [];
+      this._blacklistedMatches = []; // This is to prevent mirror matches
       this._team1 = {};
       this._team2 = {};
    }
@@ -204,56 +205,102 @@ class PlayerManager {
 
       const options = [];
 
-      let i = 0;
-      while (i < 25) {
-         // Reset all the teams
-         const team1Ids = [];
-         const team2Ids = [];
-         const team1Rating = [];
-         const team2Rating = [];
+      let attempts = 0;
+      let foundAtLeast1Match = false;
+      while (!foundAtLeast1Match && attempts < 25) {
+         let i = 0;
+         while (i < 25) {
+            // Reset all the teams
+            const team1Ids = [];
+            const team2Ids = [];
+            const team1Rating = [];
+            const team2Rating = [];
 
-         for (const [userId, player] of this._players) {
-            // Check if the player has a rating
-            if (!player.rating) {
-               // Generate a rating for the player
-               player.rating = rating();
-               // Update the player
-               this._players.set(userId, player);
+            for (const [userId, player] of this._players) {
+               // Check if the player has a rating
+               if (!player.rating) {
+                  // Generate a rating for the player
+                  player.rating = rating();
+                  // Update the player
+                  this._players.set(userId, player);
+               }
+
+               // Generate a random number
+               const randomNum = Math.floor(Math.random() * 2) + 1;
+
+               // Assign the player to the correct team
+               if (randomNum === 1) {
+                  team1Ids.push(player.member.user.id);
+                  team1Rating.push(player.rating);
+               } else {
+                  team2Ids.push(player.member.user.id);
+                  team2Rating.push(player.rating);
+               }
             }
 
-            // Generate a random number
-            const randomNum = Math.floor(Math.random() * 2) + 1;
-
-            // Assign the player to the correct team
-            if (randomNum === 1) {
-               team1Ids.push(player.member.user.id);
-               team1Rating.push(player.rating);
-            } else {
-               team2Ids.push(player.member.user.id);
-               team2Rating.push(player.rating);
+            if (team1Rating.length === 0 || team2Rating.length === 0) {
+               // No players in one of the teams
+               continue;
             }
+
+            // Check if the same game has been previously played
+            let isBlacklisted = false;
+            for (const match of this._blacklistedMatches) {
+               const { team1, team2 } = match;
+
+               if (isBlacklisted) {
+                  continue;
+               }
+
+               if (
+                  team1.includes(...team1Ids) &&
+                  team1.length === team1Ids.length &&
+                  team2.includes(...team2Ids) &&
+                  team2.length === team2Ids.length
+               ) {
+                  isBlacklisted = true;
+               }
+
+               if (
+                  team1.includes(...team2Ids) &&
+                  team1.length === team2Ids.length &&
+                  team2.includes(...team1Ids) &&
+                  team2.length === team1Ids.length
+               ) {
+                  isBlacklisted = true;
+               }
+            }
+
+            if (isBlacklisted) {
+               i++;
+               console.log("Preventing Mirror match, attempt:", attempts, ", Try:", i);
+               continue;
+            }
+
+            // Check the probability of the teams drawing
+            const prediction = predictDraw([team1Rating, team2Rating]);
+
+            // Save the possible teams to the options array
+            foundAtLeast1Match = true;
+            options.push({
+               prediction,
+               team1: team1Ids,
+               team1Rating,
+               team2: team2Ids,
+               team2Rating,
+            });
+
+            i++;
          }
 
-         if (team1Rating.length === 0 || team2Rating.length === 0) {
-            // No players in one of the teams
+         if (options.length === 0) {
+            // Rain out of options and have to create mirror match
+            this._blacklistedMatches = [];
+            attempts = 0;
             continue;
          }
 
-         // TODO: Check if the same game has been previously played
-
-         // Check the probability of the teams drawing
-         const prediction = predictDraw([team1Rating, team2Rating]);
-
-         // Save the possible teams to the options array
-         options.push({
-            prediction,
-            team1: team1Ids,
-            team1Rating,
-            team2: team2Ids,
-            team2Rating,
-         });
-
-         i++;
+         attempts++;
       }
 
       // Sort the results to the highest prediction to draw to get the best even match
@@ -265,6 +312,15 @@ class PlayerManager {
       // Assign the team to the cached teams
       this._team1 = { ids: result.team1, rating: result.team1Rating };
       this._team2 = { ids: result.team2, rating: result.team2Rating };
+
+      // Cache the match to the blacklisted matches to prevent mirror matches
+      this._blacklistedMatches.push({ team1: this._team1.ids, team2: this._team2.ids });
+
+      // Remove the oldest match to cycle through them again
+      if (this._blacklistedMatches.length >= 5) {
+         console.log("Removing a blacklisted match");
+         this._blacklistedMatches.shift();
+      }
 
       return { team1: this._team1, team2: this._team2 };
    }

@@ -39,6 +39,7 @@ module.exports = async (interaction, instance) => {
    const team1 = [];
    for (const id of result.team1.ids) {
       const member = await interaction.guild.members.fetch(id).then((member) => member);
+      // const member = await instance.client.users.fetch(id).then((user) => ({ user }));
 
       if (!member) {
          continue;
@@ -63,6 +64,7 @@ module.exports = async (interaction, instance) => {
    let team2 = [];
    for (const id of result.team2.ids) {
       const member = await interaction.guild.members.fetch(id).then((member) => member);
+      // const member = await instance.client.users.fetch(id).then((user) => ({ user }));
 
       if (!member) {
          continue;
@@ -105,7 +107,6 @@ module.exports = async (interaction, instance) => {
    const team1Emoji = (await interaction.guild.emojis.cache.find((emoji) => emoji.name === "one")?.toString()) || "❔";
    const team2Emoji = (await interaction.guild.emojis.cache.find((emoji) => emoji.name === "two")?.toString()) || "❔";
 
-   // TODO: Added a prefiction of which team wins: use the spoilers "||${prediction}||"
    const embed = new EmbedBuilder()
       .setColor(0xd7a35f)
       .setTitle(`${redSiren} Important Information ${blueSiren}`)

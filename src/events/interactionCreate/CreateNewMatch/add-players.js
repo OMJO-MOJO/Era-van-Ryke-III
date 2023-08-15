@@ -7,9 +7,11 @@ module.exports = async (interaction, instance) => {
    }
 
    // Add players to manager
+   // const playerIds = ["709375696471851008", ...interaction.values];
    const playerIds = interaction.values;
    for (const id of playerIds) {
       const member = interaction.guild.members.cache.get(id);
+      // const member = await instance.client.users.fetch(id).then((user) => ({ user }));
 
       if (!member) {
          continue;
