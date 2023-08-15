@@ -33,7 +33,7 @@ module.exports = async (interaction, instance) => {
       });
    }
 
-   const team2Channel = interaction.guild.channels.cache.find((channel) => channel.name === "Span A");
+   const team2Channel = interaction.guild.channels.cache.find((channel) => channel.name === "Span B");
    if (!team2Channel) {
       return interaction.reply({
          embeds: [new EmbedBuilder().setColor("Red").setDescription("❌ - Unable to find team 2's voice channel")],

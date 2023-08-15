@@ -32,8 +32,7 @@ module.exports = (interaction, instance) => {
             .setCustomId("confirm-players")
             .setLabel("Confirm Players")
             .setStyle(ButtonStyle.Primary)
-            .setDisabled(PlayerManager.players.size === 0 ? true : false),
-         new ButtonBuilder().setCustomId("close-civs").setLabel("Close").setStyle(ButtonStyle.Danger)
+            .setDisabled(PlayerManager.players.size === 0 ? true : false)
       );
    }
 
@@ -47,7 +46,8 @@ module.exports = (interaction, instance) => {
          .setCustomId("show-remove-player-list")
          .setLabel("Remove Player")
          .setStyle(ButtonStyle.Danger)
-         .setDisabled(PlayerManager.players.size === 0)
+         .setDisabled(PlayerManager.players.size === 0),
+      new ButtonBuilder().setCustomId("close-civs").setLabel("Close").setStyle(ButtonStyle.Danger)
    );
 
    interaction.update({
