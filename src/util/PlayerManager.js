@@ -8,8 +8,14 @@ class PlayerManager {
       this._players = new Map();
       this._unavailableCivs = [];
       this._blacklistedMatches = []; // This is to prevent mirror matches
-      this._team1 = {};
-      this._team2 = {};
+      this._team1 = {
+         ids: [],
+         rating: [],
+      };
+      this._team2 = {
+         ids: [],
+         rating: [],
+      };
    }
 
    get players() {
@@ -29,11 +35,37 @@ class PlayerManager {
       this._unavailableCivs = [];
    }
 
+   resetTeams(teamNum = null) {
+      // Reset the players
+      for (const [userId, player] of this._players) {
+         if (player.team === teamNum || !teamNum) {
+            player.team = null;
+            this._players.set(userId, player);
+         }
+      }
+
+      // Reset the teams cache
+      if (!teamNum || teamNum === 1) {
+         this._team1 = {
+            ids: [],
+            rating: [],
+         };
+      }
+
+      if (!teamNum || teamNum === 2) {
+         this._team2 = {
+            ids: [],
+            rating: [],
+         };
+      }
+   }
+
    resetAll() {
-      this._players = new Map();
-      this._unavailableCivs = [];
-      this._team1 = {};
-      this._team2 = {};
+      this.clearPlayers();
+
+      this._blacklistedMatches = [];
+
+      this.resetTeams();
    }
 
    async addPlayer(member) {
@@ -82,7 +114,46 @@ class PlayerManager {
       totalCivs = profile.civs.filter((civ) => civ.enabled === true)?.length;
 
       // Add the player to the list
-      this._players.set(member.user.id, { member, profile, rating: playerProfile.rating, civ: null, totalCivs: totalCivs });
+      this._players.set(member.user.id, { member, profile, rating: playerProfile.rating, civ: null, totalCivs: totalCivs, team: null });
+   }
+
+   async setTeam(userId, teamNum) {
+      if (!userId) {
+         throw new Error("The userId is required to set the player's team.");
+      }
+
+      if (!teamNum) {
+         throw new Error("The teamNum is required to set the player's team.");
+      }
+
+      if (typeof teamNum !== "number") {
+         throw new TypeError("The teamNum should be a number type.");
+      }
+
+      // Get the player
+      const player = this._players.get(userId);
+
+      // Check if the player exists
+      if (!player) {
+         return;
+      }
+
+      // Set the teamNum to the player
+      player.team = teamNum;
+
+      // Save the player to the cache
+      this._players.set(userId, player);
+
+      // Set the player to the correct team
+      if (teamNum === 1) {
+         this._team1.ids.push(userId);
+         this._team1.rating.push(player.rating);
+      } else if (teamNum === 2) {
+         this._team2.ids.push(userId);
+         this._team2.rating.push(player.rating);
+      } else {
+         throw new Error("Unable to find team, please make sure that there is only team 1 and 2.");
+      }
    }
 
    removePlayer(id) {
@@ -200,8 +271,7 @@ class PlayerManager {
       }
 
       // Reset the cached teams
-      this._team1 = {};
-      this._team2 = {};
+      this.resetTeams();
 
       const options = [];
 

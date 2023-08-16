@@ -6,7 +6,7 @@ module.exports = async (interaction, instance) => {
       return;
    }
 
-   if (!PlayerManager.players.get(interaction.member.user.id)) {
+   if (!PlayerManager.players.get(interaction.member.user.id) && !interaction.member.voice) {
       return interaction.reply({
          embeds: [
             new EmbedBuilder()
@@ -39,7 +39,7 @@ module.exports = async (interaction, instance) => {
       const flag = await interaction.guild.emojis.cache.find((emoji) => emoji.name === civ.name);
 
       value.push({
-         name: i === 0 ? "Results" : "** **",
+         name: i === 0 ? "Players" : "** **",
          value: `- **${member.user.username}**\n> ${flag ? flag.toString() : "❔"} ${civ.name}\n  - *1/${totalCivs} Civs* `,
          inline: true,
       });
@@ -49,8 +49,14 @@ module.exports = async (interaction, instance) => {
 
    const buttons = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
+         .setCustomId("create-teams")
+         .setLabel(PlayerManager.players.size >= 2 ? "Create Teams" : "Need at least 2 players to create teams")
+         .setStyle(ButtonStyle.Success)
+         .setDisabled(PlayerManager.players.size < 2 ? true : false),
+
+      new ButtonBuilder()
          .setCustomId("generate-teams")
-         .setLabel(PlayerManager.players.size >= 2 ? "Generate Teams" : "Need at least 2 players to create teams")
+         .setLabel(PlayerManager.players.size >= 2 ? "Generate Teams" : "Need at least 2 players to generate teams")
          .setStyle(ButtonStyle.Primary)
          .setDisabled(PlayerManager.players.size < 2 ? true : false),
 

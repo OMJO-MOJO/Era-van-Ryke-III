@@ -2,8 +2,15 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("
 const PlayerManager = require("../../../features/PlayerManager");
 
 module.exports = async (interaction, instance) => {
-   if (interaction.customId !== "generate-teams") {
+   const interactionId = interaction.customId.split("_");
+
+   if (interactionId[0] !== "generate-teams") {
       return;
+   }
+
+   let generateTeams = true;
+   if (interactionId.length >= 2) {
+      generateTeams = interactionId[1] === "true";
    }
 
    if (!PlayerManager.players.get(interaction.member.user.id)) {
@@ -32,12 +39,14 @@ module.exports = async (interaction, instance) => {
       });
    }
 
-   // Generate the teams
-   const result = await PlayerManager.generateTeams();
+   // Generate the teams if requested
+   if (generateTeams) {
+      await PlayerManager.generateTeams();
+   }
 
    // Get all the players in team 1
    const team1 = [];
-   for (const id of result.team1.ids) {
+   for (const id of PlayerManager.team1.ids) {
       const member = await interaction.guild.members.fetch(id).then((member) => member);
       // const member = await instance.client.users.fetch(id).then((user) => ({ user }));
 
@@ -62,7 +71,7 @@ module.exports = async (interaction, instance) => {
 
    // Get all the players in team 2
    let team2 = [];
-   for (const id of result.team2.ids) {
+   for (const id of PlayerManager.team2.ids) {
       const member = await interaction.guild.members.fetch(id).then((member) => member);
       // const member = await instance.client.users.fetch(id).then((user) => ({ user }));
 
