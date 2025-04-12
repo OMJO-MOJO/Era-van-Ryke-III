@@ -18,7 +18,7 @@
    },
    "homepage": "https://github.com/OMJO-MOJO/Age-Of-Empires-3-DE-Matchmaker#readme",
    "dependencies": {
-      "discord.js": "^14.12.1",
+      "discord.js": "^14.18.0",
       "dotenv": "^16.3.1",
       "openskill": "^3.1.0",
       "pagination.djs": "^4.0.12",
