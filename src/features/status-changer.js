@@ -20,5 +20,5 @@ module.exports = (instance, client) => {
    changeStatus();
    setInterval(() => {
       changeStatus();
-   }, 10 * 1000); // Every 1 minute
+   }, 20 * 1000); // Every 20 seconds
 };
