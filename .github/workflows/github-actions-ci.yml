@@ -19,7 +19,7 @@ jobs:
    deploy:
       runs-on: Linux
 
-            strategy:
+      strategy:
          matrix:
             node-version: [20.18.0]
 
