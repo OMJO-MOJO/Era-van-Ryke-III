@@ -19,8 +19,26 @@ jobs:
    deploy:
       runs-on: Linux
 
+            strategy:
+         matrix:
+            node-version: [20.18.0]
+
       steps:
          - uses: actions/checkout@v4
+
+         - name: Use Node.js ${{ matrix.node-version }}
+           uses: actions/setup-node@v4
+           with:
+              node-version: ${{ matrix.node-version }}
+
+         - name: Installing NPM Packages
+           run: npm install
+
+         - name: Installing Server & Build Tools
+           run: npm install typescript copyfiles
+
+         - name: Installing PM2 Globally
+           run: sudo -S <<< "${{ secrets.SUDO_PASSWORD }}" npm install -g pm2
 
          - name: Create .env file
            run: |
