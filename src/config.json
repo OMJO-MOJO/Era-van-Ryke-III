@@ -1,6 +1,7 @@
 {
-   "botOwnerIds": ["YOUR_DISCORD_ID"],
-   "testServerIds": ["YOUR_TEST_SERVER_ID"],
-   "generalId": "GENERAL_VOICE_CHANNEL_ID",
-   "voiceChannelsId": "VOICE_CHANNELS_CATEGORY_ID"
+   "botOwnerIds": ["526782947123134465"],
+   "testServerIds": ["701144661699461190"],
+   "generalId": "701144661699461194",
+   "voiceChannelsId": "701144661699461192",
+   "wallOfShame": "https://imgur.com/6v03IHW.png"
 }

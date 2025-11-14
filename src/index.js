@@ -11,6 +11,7 @@ const { Client, IntentsBitField } = require("discord.js");
 const path = require("path");
 const WOKCommands = require("wokcommands");
 const config = require("./config.json");
+const WallOfShameManager = require("./managers/WallOfShameManager");
 
 // Register the environment variables
 require("dotenv").config();
@@ -26,9 +27,11 @@ const client = new Client({
    ],
 });
 
-client.on("ready", async (client) => {
+client.on("ready", async (c) => {
+   c.wallOfShame = new WallOfShameManager();
+
    await new WOKCommands({
-      client,
+      client: c,
       mongoUri: process.env.MONGO_URI,
       defaultPrefix: "!",
       featuresDir: path.join(__dirname, "features"),
