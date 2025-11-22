@@ -38,7 +38,7 @@ jobs:
            run: npm install typescript copyfiles
 
          - name: Installing PM2 Globally
-           run: sudo -S <<< "${{ secrets.SUDO_PASSWORD }}" npm install -g pm2
+           run: npm install pm2
 
          - name: Create .env file
            run: |
